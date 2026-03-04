@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sss</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Playfair+Display&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/3d.css">
+
+</head>
+<body>
+    <main>
+        <div data-scroll>
+            <div class="page">
+
+          
+            <div class="video-container">
+                
+            </div>
+                <!-- END grid -->
+
+                <!-- END footer -->
+            </div>
+            <!-- end page -->
+
+        </div>
+        <!-- end scroll -->
+    </main>
+
+
+    <div id="container"></div>
+        
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.173.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.173.0/examples/jsm/",
+            "gsap": "https://cdn.skypack.dev/gsap"
+          }
+        }
+        </script>
+
+
+  <script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fontfaceobserver/2.1.0/fontfaceobserver.js"></script>
+  
+
+<script type="module">
+import Sketch from './js/3d.js';
+
+const el = document.querySelector('.video-container');
+console.log('video container element:', el);   // <–– is this null?
+new Sketch({
+    dom: document.getElementById('container'),
+    targetEl: el
+});
+</script>
+
+	</body>
+</html>

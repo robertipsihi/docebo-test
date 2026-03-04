@@ -39,27 +39,53 @@ export default class Sketch {
 		// Load shaders
 		const loadShadersPromise = this.loadShaders();
 
-		// Video loading promise
-		const loadVideoPromise = new Promise((resolve) => {
+		// Video loading promise – waits for canplaythrough or timeout
+		const loadVideoPromise = new Promise((resolve, reject) => {
 			const video = document.createElement('video');
 			video.src = 'video/video.webm';
 			video.crossOrigin = 'anonymous';
 			video.loop = true;
-			video.muted = true; // usually required for autoplay
+			video.muted = true;
 			video.playsInline = true;
-			video.load();
 
-			// once metadata is available we can compute aspect ratios
-			video.addEventListener('loadedmetadata', () => {
+			// Timeout safety: if video doesn't load within 30s, resolve anyway
+			const timeout = setTimeout(() => {
+				console.warn('Video preload timeout; proceeding anyway');
+				if (video._aspect === undefined) {
+					video._aspect = 16 / 9; // fallback
+				}
+				clearAllListeners();
+				resolve(video);
+			}, 30000);
+
+			const clearAllListeners = () => {
+				video.removeEventListener('canplaythrough', onCanPlayThrough);
+				video.removeEventListener('loadedmetadata', onLoadedMeta);
+				video.removeEventListener('error', onError);
+			};
+
+			const onLoadedMeta = () => {
 				video._aspect = video.videoWidth / video.videoHeight;
-			});
+			};
 
-			// Resolve once the video can play
-			const onCanPlay = () => {
-				video.removeEventListener('canplaythrough', onCanPlay);
+			const onCanPlayThrough = () => {
+				clearTimeout(timeout);
+				clearAllListeners();
 				resolve(video);
 			};
-			video.addEventListener('canplaythrough', onCanPlay);
+
+			const onError = () => {
+				clearTimeout(timeout);
+				clearAllListeners();
+				console.error('Video failed to load');
+				reject(new Error('Video load failed'));
+			};
+
+			video.addEventListener('loadedmetadata', onLoadedMeta);
+			video.addEventListener('canplaythrough', onCanPlayThrough);
+			video.addEventListener('error', onError);
+
+			video.load();
 		});
 
 		Promise.all([fontOpen, fontPlayfair, loadShadersPromise, loadVideoPromise]).then(([_, __, ___, video]) => {
